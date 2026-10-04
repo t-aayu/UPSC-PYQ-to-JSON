@@ -144,7 +144,159 @@
 </div>
 
 <script>
-let syllabusData = [];
+let syllabusData = [
+  {
+    "Paper": "GS1",
+    "subjects": [
+      {
+        "subject code": "AnC",
+        "subject": "Art & Culture",
+        "syllabus": [
+          "Indian culture will cover the salient aspects of Art Forms, literature and Architecture from ancient to modern times."
+        ]
+      },
+      {
+        "subject code": "his",
+        "subject": "Modern History and Post Indepenence India",
+        "syllabus": [
+          "Modern Indian history from about the middle of the eighteenth century until the present-significant events, personalities, issues.",
+          "The Freedom Struggle — its various stages and important contributors/contributions from different parts of the country.",
+          "Post-independence consolidation and reorganization within the country."
+        ]
+      },
+      {
+        "subject code": "WHi",
+        "subject": "World history",
+        "syllabus": [
+          "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism,capitalism, socialism etc.— their forms and effect on the society."
+        ]
+      },
+      {
+        "subject code": "ISo",
+        "subject": "Indian Society",
+        "syllabus": [
+          "Salient features of Indian Society, Diversity of India.",
+          "Role of women and women’s organization, population and associated issues, poverty and developmental issues, urbanization, their problems, and their remedies.",
+          "Effects of globalization on Indian society.",
+          "Social empowerment, communalism, regionalism & secularism."
+        ]
+      },
+      {
+        "subject code": "Geo",
+        "subject": "Geography",
+        "syllabus": [
+          "Salient features of world’s physical geography.",
+          "Distribution of key natural resources across the world (including South Asia and the Indian sub-continent); factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
+          "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc., geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes"
+        ]
+      }
+    ]
+  },
+  {
+    "Paper": "GS2",
+    "subjects": [
+      {
+        "subject code": "Pol",
+        "subject": "Polity",
+        "syllabus": [
+          "Indian Constitution—historical underpinnings, evolution, features, amendments, significant provisions and basic structure.",
+          "Functions and responsibilities of the Union and the States, issues and challenges pertaining to the federal structure, devolution of powers and finances up to local levels and challenges therein.",
+          "Separation of powers between various organs dispute redressal mechanisms and institutions.",
+          "Comparison of the Indian constitutional scheme with that of other countries.",
+          "Parliament and State legislatures—structure, functioning, conduct of business, powers & privileges and issues arising out of these.",
+          "Structure, organization and functioning of the Executive and the Judiciary—Ministries and Departments of the Government; pressure groups and formal/informal associations and their role in the Polity.",
+          "Salient features of the Representation of People’s Act.",
+          "Appointment to various Constitutional posts, powers, functions and responsibilities of various Constitutional Bodies.",
+          "Statutory, regulatory and various quasi-judicial bodies.",
+          "Government policies and interventions for development in various sectors and issues arising out of their design and implementation.",
+          "Development processes and the development industry —the role of NGOs, SHGs, various groups and associations, donors, charities, institutional and other stakeholders."
+        ]
+      },
+      {
+        "subject code": "SoJ",
+        "subject": "Social Justice",
+        "syllabus": [
+          "Welfare schemes for vulnerable sections of the population by the Centre and States and the performance of these schemes; mechanisms, laws, institutions and Bodies constituted for the protection and betterment of these vulnerable sections.",
+          "Issues relating to development and management of Social Sector/Services relating to Health, Education, Human Resources.",
+          "Issues relating to poverty and hunger."
+        ]
+      },
+      {
+        "subject code": "Gov",
+        "subject": "Governance",
+        "syllabus": [
+          "Important aspects of governance, transparency and accountability, e-governance- applications, models, successes, limitations, and potential; citizens charters, transparency & accountability and institutional and other measures.",
+          "Role of civil services in a democracy."
+        ]
+      },
+      {
+        "subject code": "InR",
+        "subject": "International relations",
+        "syllabus": [
+          "India and its neighbourhood- relations.",
+          "Bilateral, regional and global groupings and agreements involving India and/or affecting India’s interests.",
+          "Effect of policies and politics of developed and developing countries on India’s interests, Indian diaspora.",
+          "Important International institutions, agencies, and fora- their structure, mandate."
+        ]
+      }
+    ]
+  },
+  {
+    "Paper": "GS3",
+    "subjects": [
+      {
+        "subject code": "Eco",
+        "subject": "Economy",
+        "syllabus": [
+          "Indian Economy and issues relating to planning, mobilization, of resources, growth, development and employment.",
+          "Inclusive growth and issues arising from it.",
+          "Government Budgeting.",
+          "Major crops-cropping patterns in various parts of the country, - different types of irrigation and irrigationsystems storage, transport and marketing of agricultural produce and issues and related constraints; etechnology in the aid of farmers.",
+          "Issues related to direct and indirect farm subsidies and minimum support prices; Public Distribution System- objectives, functioning, limitations, revamping; issues of buffer stocks and food security; Technology missions; economics of animal-rearing.",
+          "Food processing and related industries in India- scope’ and significance, location, upstream and downstream requirements, supply chain management.",
+          "Land reforms in India.",
+          "Effects of liberalization on the economy, changes in industrial policy and their effects on industrial growth.",
+          "Infrastructure: Energy, Ports, Roads, Airports, Railways etc.",
+          "Investment models."
+        ]
+      },
+      {
+        "subject code": "SnT",
+        "subject": "Science & Technology",
+        "syllabus": [
+          "Science and Technology- developments and their applications and effects in everyday life.",
+          "Achievements of Indians in science & technology; indigenization of technology and developing new technology.",
+          "Awareness in the fields of IT, Space, Computers, robotics, nano-technology, bio-technology and issues relating to intellectual property rights"
+        ]
+      },
+      {
+        "subject code": "EBD",
+        "subject": "Environment & Biodiversity",
+        "syllabus": [
+          "Conservation, environmental pollution and degradation, environmental impact assessment."
+        ]
+      },
+      {
+        "subject code": "DDM",
+        "subject": "Disaster Management",
+        "syllabus": [
+          "Disaster and disaster management."
+        ]
+      },
+      {
+        "subject code": "ISe",
+        "subject": "Internal Security",
+        "syllabus": [
+          "Linkages between development and spread of extremism.",
+          "Role of external state and non-state actors in creating challenges to internal security.",
+          "Challenges to internal security through communication networks, role of media and social networking sites in internal security challenges, basics of cyber security; money-laundering and its prevention.",
+          "Security challenges and their management in border areas - linkages of organized crime with terrorism.",
+          "Various Security forces and agencies and their mandate"
+        ]
+      }
+    ]
+  }
+];
 
 const years = Array.from({length: 14}, (_, i) => 2013 + i);
 const el = id => document.getElementById(id);
@@ -294,11 +446,7 @@ async function init() {
     populateSubjects();
   } catch (error) {
     console.error('Unable to load syllabus.json', error);
-    el('subject').innerHTML = '<option value="">Unable to load syllabus.json</option>';
-    el('syllabusOptions').innerHTML = '<div class="hint">Unable to load syllabus.json.</div>';
-    el('selectedCode').textContent = '—';
-    el('generate').disabled = true;
-    alert('Could not load syllabus.json. Please check that the file exists and contains valid JSON.');
+    populateSubjects();
   }
   el('paper').addEventListener('change', populateSubjects);
   el('subject').addEventListener('change', updateSyllabusLines);
