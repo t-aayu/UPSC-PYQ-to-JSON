@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPSC Mains PYQ Data Entry</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: light-dark(#f4f6f8, #101418);
+    --surface: light-dark(#ffffff, #171c21);
+    --surface-2: light-dark(#f8fafb, #1d242b);
+    --text: light-dark(#18212a, #eef2f5);
+    --muted: light-dark(#66727e, #aab5bf);
+    --border: light-dark(#dce2e7, #303a43);
+    --accent: light-dark(#1f5eff, #6e94ff);
+    --accent-soft: light-dark(#edf2ff, #202c49);
+    --success: light-dark(#147a4b, #62d49a);
+    --danger: light-dark(#b42318, #ff8f87);
+    --shadow: 0 8px 28px light-dark(rgba(26, 37, 48, .07), rgba(0,0,0,.25));
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  #app { min-height: 100vh; background: var(--bg); }
+  .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; }
+  header { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 22px; }
+  .eyebrow { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 7px; }
+  h1 { margin: 0; font-size: clamp(25px, 4vw, 36px); line-height: 1.08; letter-spacing: -.03em; }
+  .subtitle { margin: 8px 0 0; color: var(--muted); max-width: 720px; line-height: 1.5; font-size: 14px; }
+  .status { color: var(--muted); font-size: 13px; text-align: right; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+  .filters { padding: 18px; margin-bottom: 18px; }
+  .filter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+  .field { min-width: 0; }
+  label { display: block; font-size: 12px; font-weight: 750; margin-bottom: 7px; color: var(--muted); }
+  select, input, textarea { width: 100%; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); color: var(--text); font: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
+  select, input { height: 42px; padding: 0 12px; }
+  textarea { min-height: 220px; padding: 13px; resize: vertical; line-height: 1.55; }
+  select:focus, input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
+  .main-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; }
+  .entry, .output { padding: 20px; }
+  .section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .section-title h2 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
+  .badge { font-size: 11px; color: var(--accent); background: var(--accent-soft); padding: 5px 8px; border-radius: 999px; font-weight: 750; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+  .hint { color: var(--muted); font-size: 11px; margin-top: 6px; line-height: 1.4; }
+  .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+  button { border: 0; border-radius: 9px; height: 40px; padding: 0 14px; font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; }
+  .primary { background: var(--accent); color: white; }
+  .secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .success { background: var(--success); color: white; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .json-wrap { position: relative; }
+  pre { margin: 0; min-height: 450px; max-height: 620px; overflow: auto; background: light-dark(#101820, #0c1014); color: #dce7ef; border-radius: 10px; padding: 16px; font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+  .empty { color: #8ea0ae; }
+  .saved-list { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .saved-list h3 { font-size: 13px; margin: 0 0 9px; }
+  .record { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .record small { color: var(--muted); }
+  .record button { height: 30px; padding: 0 9px; font-size: 11px; }
+  .note { margin-top: 12px; padding: 11px 12px; border: 1px solid var(--border); background: var(--surface-2); border-radius: 9px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .filter-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 580px) { .shell { width: min(100% - 20px, 1180px); padding-top: 20px; } header { align-items: start; flex-direction: column; } .status { text-align: left; } .filter-grid, .two { grid-template-columns: 1fr; } .entry, .output, .filters { padding: 15px; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">UPSC CSE · Data Entry Tool</div>
+        <h1>PYQ Question Builder</h1>
+        <p class="subtitle">Enter a Mains question, classify it against the syllabus, and generate clean JSON ready for your PYQ database.</p>
+      </div>
+      <div class="status" id="countStatus">0 questions generated this session</div>
+    </header>
+
+    <section class="panel filters">
+      <div class="section-title">
+        <h2>Question classification</h2>
+        <span class="badge">Question metadata</span>
+      </div>
+      <div class="filter-grid">
+        <div class="field"><label for="year">Year</label><select id="year"></select></div>
+        <div class="field"><label for="marks">Marks</label><select id="marks"><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option></select></div>
+        <div class="field"><label for="paper">Paper</label><select id="paper"><option value="GS1">GS1</option><option value="GS2">GS2</option><option value="GS3">GS3</option><option value="GS4">GS4</option><option value="Essay">Essay</option></select></div>
+        <div class="field"><label for="subject">Subject</label><select id="subject"></select></div>
+      </div>
+    </section>
+
+    <div class="main-grid">
+      <section class="panel entry">
+        <div class="section-title"><h2>Enter question</h2><span class="badge" id="selectedCode">—</span></div>
+        <div class="field">
+          <label for="wordLimit">Word limit</label>
+          <select id="wordLimit"><option value="150">150</option><option value="250">250</option><option value="0">Not specified</option></select>
+        </div>
+
+        <div class="field" style="margin-top:13px">
+          <label for="question">Question</label>
+          <textarea id="question" placeholder="Paste or type the exact UPSC question here..."></textarea>
+        </div>
+
+        <div class="field" style="margin-top:13px">
+          <label for="syllabusLine">Syllabus line</label>
+          <select id="syllabusLine"></select>
+        </div>
+        <div class="hint">Syllabus lines are loaded from the selected subject above.</div>
+
+        <div class="two" style="margin-top:13px">
+          <div class="field"><label for="topics">Topics</label><input id="topics" placeholder="e.g. urbanization, migration"></div>
+          <div class="field"><label for="keywords">Keywords</label><input id="keywords" placeholder="e.g. cities, population, women"></div>
+        </div>
+        <div class="hint">Separate multiple topics or keywords with commas. These can be refined later as your taxonomy develops.</div>
+
+        <div class="actions">
+          <button class="primary" id="generate">Generate JSON</button>
+          <button class="secondary" id="clear">Clear form</button>
+          <button class="secondary" id="nextQuestion" disabled>Next question</button>
+        </div>
+        <div class="note">Keep your syllabus definitions separately in JSON. The builder only stores the selected syllabus-line ID in each question record.</div>
+      </section>
+
+      <section class="panel output">
+        <div class="section-title"><h2>Generated JSON</h2><span class="badge">Database record</span></div>
+        <div class="json-wrap"><pre id="jsonOutput"><span class="empty">Your generated question JSON will appear here.</span></pre></div>
+        <div class="actions">
+          <button class="success" id="copy" disabled>Copy JSON</button>
+          <button class="secondary" id="download" disabled>Download JSON</button>
+          <button class="secondary" id="addRecord" disabled>Add to session</button>
+          <button class="primary" id="nextQuestionOutput" disabled>Next question</button>
+        </div>
+        <div class="saved-list" id="savedList" hidden>
+          <h3>Session records</h3>
+          <div id="records"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+const syllabusData = [
+  { "subject": "Art & Culture", "syllabus": [] },
+  { "subject": "History", "syllabus": [] },
+  { "subject": "Geography", "syllabus": [] },
+  { "subject": "Indian Society", "syllabus": [
+    "Salient features of Indian Society, Diversity of India.",
+    "Role of women and women’s organization, population and associated issues, poverty and developmental issues, urbanization, their problems, and their remedies.",
+    "Effects of globalization on Indian society.",
+    "Social empowerment, communalism, regionalism & secularism."
+  ] },
+  { "subject": "Polity", "syllabus": [] },
+  { "subject": "IR", "syllabus": [] },
+  { "subject": "Governance", "syllabus": [] },
+  { "subject": "Social Justice", "syllabus": [] },
+  { "subject": "Economy", "syllabus": [] },
+  { "subject": "Science & Technology", "syllabus": [] },
+  { "subject": "Environment & Biodiversity", "syllabus": [] },
+  { "subject": "Disaster Management", "syllabus": [] },
+  { "subject": "Internal Security", "syllabus": [] }
+];
+
+const years = Array.from({length: 14}, (_, i) => 2013 + i);
+const el = id => document.getElementById(id);
+let lastJson = null;
+let records = [];
+
+function populateYears() {
+  el('year').innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+  el('year').value = '2025';
+}
+function populateSubjects() {
+  const options = syllabusData.map(s => `<option value="${escapeAttr(s.subject)}">${escapeHtml(s.subject)}</option>`).join('');
+  el('subject').innerHTML = options;
+  el('subject').value = 'Indian Society';
+  updateSyllabusLines();
+}
+function updateSyllabusLines() {
+  const subject = el('subject').value;
+  const subjectData = syllabusData.find(s => s.subject === subject);
+  const lines = subjectData ? subjectData.syllabus : [];
+  const select = el('syllabusLine');
+  if (!lines.length) {
+    select.innerHTML = '<option value="">Syllabus lines not added yet</option>';
+    el('selectedCode').textContent = '—';
+    return;
+  }
+  select.innerHTML = lines.map((line, index) => `<option value="${escapeAttr(line)}">${index + 1}. ${escapeHtml(line)}</option>`).join('');
+  el('selectedCode').textContent = `Line 1`;
+}
+function syncSubject(subject) {
+  el('subject').value = subject;
+  updateSyllabusLines();
+}
+function updateCode() {
+  const option = el('syllabusLine').selectedOptions[0];
+  el('selectedCode').textContent = option && option.value ? `Line ${option.index + 1}` : '—';
+}
+function csv(value) {
+  return value.split(',').map(x => x.trim()).filter(Boolean);
+}
+function generate() {
+  const question = el('question').value.trim();
+  if (!question) {
+    alert('Please enter the question.');
+    return;
+  }
+  const syllabusLine = el('syllabusLine').value || null;
+  const obj = {
+    year: Number(el('year').value),
+    paper: el('paper').value,
+    marks: Number(el('marks').value),
+    word_limit: Number(el('wordLimit').value),
+    question,
+    syllabus: syllabusLine ? [syllabusLine] : [],
+    subject: el('subject').value,
+    topics: csv(el('topics').value),
+    keywords: csv(el('keywords').value)
+  };
+  lastJson = obj;
+  el('jsonOutput').textContent = JSON.stringify([...records, obj], null, 2);
+  ['copy','download','addRecord','nextQuestion','nextQuestionOutput'].forEach(id => el(id).disabled = false);
+}
+function clearForm() {
+  el('question').value = '';
+  el('topics').value = '';
+  el('keywords').value = '';
+  el('jsonOutput').textContent = records.length ? JSON.stringify(records, null, 2) : '';
+  if (!records.length) el('jsonOutput').innerHTML = '<span class="empty">Your generated question JSON will appear here.</span>';
+  lastJson = null;
+  ['copy','download','addRecord','nextQuestion','nextQuestionOutput'].forEach(id => el(id).disabled = true);
+}
+function nextQuestion() {
+  if (!lastJson) return;
+  addRecord();
+  el('question').value = '';
+  el('topics').value = '';
+  el('keywords').value = '';
+  lastJson = null;
+  el('jsonOutput').textContent = JSON.stringify(records, null, 2);
+  ['copy','download','addRecord','nextQuestion','nextQuestionOutput'].forEach(id => el(id).disabled = true);
+  el('question').focus();
+}
+function addRecord() {
+  if (!lastJson) return;
+  const exists = records.some(r => r.year === lastJson.year && r.paper === lastJson.paper && r.question === lastJson.question);
+  if (exists) { alert('This question is already in the session.'); return; }
+  records.push(lastJson);
+  el('jsonOutput').textContent = JSON.stringify(records, null, 2);
+  renderRecords();
+  el('countStatus').textContent = `${records.length} question${records.length === 1 ? '' : 's'} generated this session`;
+}
+function renderRecords() {
+  el('savedList').hidden = records.length === 0;
+  el('records').innerHTML = records.map((r, i) => `<div class="record"><div><strong>${r.year} · ${escapeHtml(r.paper)}</strong><br><small>${escapeHtml(r.subject)} · ${r.marks} marks</small></div><button class="secondary" onclick="removeRecord(${i})">Remove</button></div>`).join('');
+}
+window.removeRecord = function(i) {
+  records.splice(i, 1);
+  renderRecords();
+  el('countStatus').textContent = `${records.length} question${records.length === 1 ? '' : 's'} generated this session`;
+};
+async function copyJson() {
+  if (!lastJson) return;
+  await navigator.clipboard.writeText(JSON.stringify(records.length ? [...records, lastJson] : lastJson, null, 2));
+  el('copy').textContent = 'Copied';
+  setTimeout(() => el('copy').textContent = 'Copy JSON', 1200);
+}
+function downloadJson() {
+  if (!lastJson) return;
+  const data = records.length ? [...records, lastJson] : lastJson;
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `upsc-pyq-${lastJson.year}-${lastJson.paper}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s) { return escapeHtml(s); }
+
+populateYears();
+populateSubjects();
+el('subject').addEventListener('change', () => syncSubject(el('subject').value));
+el('syllabusLine').addEventListener('change', updateCode);
+el('generate').addEventListener('click', generate);
+el('clear').addEventListener('click', clearForm);
+el('copy').addEventListener('click', copyJson);
+el('download').addEventListener('click', downloadJson);
+el('addRecord').addEventListener('click', addRecord);
+el('nextQuestion').addEventListener('click', nextQuestion);
+el('nextQuestionOutput').addEventListener('click', nextQuestion);
+</script>
+</body>
+</html>
