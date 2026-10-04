@@ -43,6 +43,10 @@
   .section-title h2 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
   .badge { font-size: 11px; color: var(--accent); background: var(--accent-soft); padding: 5px 8px; border-radius: 999px; font-weight: 750; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+  .syllabus-options { display: grid; gap: 8px; max-height: 260px; overflow: auto; padding: 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); }
+  .syllabus-option { display: flex; align-items: flex-start; gap: 9px; padding: 7px 5px; border-radius: 7px; cursor: pointer; line-height: 1.45; font-size: 12px; color: var(--text); }
+  .syllabus-option:hover { background: var(--accent-soft); }
+  .syllabus-option input { width: auto; height: auto; margin: 3px 0 0; accent-color: var(--accent); flex: 0 0 auto; }
   .hint { color: var(--muted); font-size: 11px; margin-top: 6px; line-height: 1.4; }
   .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
   button { border: 0; border-radius: 9px; height: 40px; padding: 0 14px; font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; }
@@ -102,10 +106,10 @@
         </div>
 
         <div class="field" style="margin-top:13px">
-          <label for="syllabusLine">Syllabus line</label>
-          <select id="syllabusLine"></select>
+          <label>Syllabus line(s)</label>
+          <div class="syllabus-options" id="syllabusOptions"></div>
         </div>
-        <div class="hint">Syllabus lines are loaded from the selected subject above.</div>
+        <div class="hint">Select one or more syllabus lines. The generated JSON will include every selected line and its corresponding tag.</div>
 
         <div class="two" style="margin-top:13px">
           <div class="field"><label for="topics">Topics</label><input id="topics" placeholder="e.g. urbanization, migration"></div>
@@ -156,7 +160,7 @@ function populateSubjects() {
   const select = el('subject');
   if (!paperData || !Array.isArray(paperData.subjects) || !paperData.subjects.length) {
     select.innerHTML = '<option value="">No subjects found</option>';
-    el('syllabusLine').innerHTML = '<option value="">No syllabus lines found</option>';
+    el('syllabusOptions').innerHTML = '<div class="hint">No syllabus lines found.</div>';
     el('selectedCode').textContent = '—';
     return;
   }
@@ -167,22 +171,24 @@ function updateSyllabusLines() {
   const paperData = syllabusData.find(p => p.Paper === el('paper').value);
   const subjectData = paperData ? paperData.subjects.find(s => s.subject === el('subject').value) : null;
   const lines = subjectData ? subjectData.syllabus : [];
-  const select = el('syllabusLine');
+  const options = el('syllabusOptions');
   if (!lines.length) {
-    select.innerHTML = '<option value="">Syllabus lines not added yet</option>';
+    options.innerHTML = '<div class="hint">Syllabus lines not added yet.</div>';
     el('selectedCode').textContent = '—';
     return;
   }
-  select.innerHTML = lines.map((line, index) => `<option value="${escapeAttr(line)}">${index + 1}. ${escapeHtml(line)}</option>`).join('');
+  options.innerHTML = lines.map((line, index) => `<label class="syllabus-option"><input type="checkbox" value="${escapeAttr(line)}" data-index="${index}"><span>${index + 1}. ${escapeHtml(line)}</span></label>`).join('');
+  options.querySelectorAll('input[type="checkbox"]').forEach(input => input.addEventListener('change', updateCode));
   updateCode();
 }
 function updateCode() {
   const paperData = syllabusData.find(p => p.Paper === el('paper').value);
   const subjectData = paperData ? paperData.subjects.find(s => s.subject === el('subject').value) : null;
-  const option = el('syllabusLine').selectedOptions[0];
-  el('selectedCode').textContent = paperData && subjectData && option && option.value
-    ? paperData.Paper + '-' + subjectData['subject code'] + '-L' + (option.index + 1)
-    : '—';
+  const selected = Array.from(el('syllabusOptions').querySelectorAll('input[type="checkbox"]:checked'));
+  const tags = paperData && subjectData
+    ? selected.map(input => paperData.Paper + '-' + subjectData['subject code'] + '-L' + (Number(input.dataset.index) + 1))
+    : [];
+  el('selectedCode').textContent = tags.length ? tags.join(', ') : '—';
 }
 function csv(value) {
   return value.split(',').map(x => x.trim()).filter(Boolean);
@@ -193,20 +199,23 @@ function generate() {
     alert('Please enter the question.');
     return;
   }
-  const syllabusLine = el('syllabusLine').value || null;
   const paperData = syllabusData.find(p => p.Paper === el('paper').value);
   const subjectData = paperData ? paperData.subjects.find(s => s.subject === el('subject').value) : null;
-  const syllabusTag = paperData && subjectData && syllabusLine
-    ? paperData.Paper + '-' + subjectData['subject code'] + '-L' + (el('syllabusLine').selectedOptions[0].index + 1)
-    : null;
+  const selected = Array.from(el('syllabusOptions').querySelectorAll('input[type="checkbox"]:checked'));
+  if (!selected.length) {
+    alert('Please select at least one syllabus line.');
+    return;
+  }
+  const syllabusLines = selected.map(input => input.value);
+  const syllabusTags = selected.map(input => paperData.Paper + '-' + subjectData['subject code'] + '-L' + (Number(input.dataset.index) + 1));
   const obj = {
     year: Number(el('year').value),
     paper: el('paper').value,
     marks: Number(el('marks').value),
     word_limit: Number(el('wordLimit').value),
     question,
-    tag: syllabusTag,
-    syllabus: syllabusLine ? [syllabusLine] : [],
+    tag: syllabusTags.length === 1 ? syllabusTags[0] : syllabusTags,
+    syllabus: syllabusLines,
     subject: el('subject').value,
     topics: csv(el('topics').value),
     keywords: csv(el('keywords').value)
@@ -286,14 +295,13 @@ async function init() {
   } catch (error) {
     console.error('Unable to load syllabus.json', error);
     el('subject').innerHTML = '<option value="">Unable to load syllabus.json</option>';
-    el('syllabusLine').innerHTML = '<option value="">Unable to load syllabus.json</option>';
+    el('syllabusOptions').innerHTML = '<div class="hint">Unable to load syllabus.json.</div>';
     el('selectedCode').textContent = '—';
     el('generate').disabled = true;
     alert('Could not load syllabus.json. Please check that the file exists and contains valid JSON.');
   }
   el('paper').addEventListener('change', populateSubjects);
   el('subject').addEventListener('change', updateSyllabusLines);
-  el('syllabusLine').addEventListener('change', updateCode);
   el('generate').addEventListener('click', generate);
   el('clear').addEventListener('click', clearForm);
   el('copy').addEventListener('click', copyJson);
