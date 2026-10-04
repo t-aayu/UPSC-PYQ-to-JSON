@@ -118,7 +118,7 @@
           <button class="secondary" id="clear">Clear form</button>
           <button class="secondary" id="nextQuestion" disabled>Next question</button>
         </div>
-        <div class="note">Keep your syllabus definitions separately in JSON. The builder only stores the selected syllabus-line ID in each question record.</div>
+        <div class="note">Keep your syllabus definitions in <code>syllabus.json</code>. The builder loads them from that file and stores the selected syllabus line in each question record.</div>
       </section>
 
       <section class="panel output">
@@ -140,26 +140,7 @@
 </div>
 
 <script>
-const syllabusData = [
-  { "subject": "Art & Culture", "syllabus": [] },
-  { "subject": "History", "syllabus": [] },
-  { "subject": "Geography", "syllabus": [] },
-  { "subject": "Indian Society", "syllabus": [
-    "Salient features of Indian Society, Diversity of India.",
-    "Role of women and women’s organization, population and associated issues, poverty and developmental issues, urbanization, their problems, and their remedies.",
-    "Effects of globalization on Indian society.",
-    "Social empowerment, communalism, regionalism & secularism."
-  ] },
-  { "subject": "Polity", "syllabus": [] },
-  { "subject": "IR", "syllabus": [] },
-  { "subject": "Governance", "syllabus": [] },
-  { "subject": "Social Justice", "syllabus": [] },
-  { "subject": "Economy", "syllabus": [] },
-  { "subject": "Science & Technology", "syllabus": [] },
-  { "subject": "Environment & Biodiversity", "syllabus": [] },
-  { "subject": "Disaster Management", "syllabus": [] },
-  { "subject": "Internal Security", "syllabus": [] }
-];
+let syllabusData = [];
 
 const years = Array.from({length: 14}, (_, i) => 2013 + i);
 const el = id => document.getElementById(id);
@@ -171,9 +152,15 @@ function populateYears() {
   el('year').value = '2025';
 }
 function populateSubjects() {
+  if (!syllabusData.length) {
+    el('subject').innerHTML = '<option value="">No syllabus data found</option>';
+    el('syllabusLine').innerHTML = '<option value="">No syllabus lines found</option>';
+    el('selectedCode').textContent = '—';
+    return;
+  }
   const options = syllabusData.map(s => `<option value="${escapeAttr(s.subject)}">${escapeHtml(s.subject)}</option>`).join('');
   el('subject').innerHTML = options;
-  el('subject').value = 'Indian Society';
+  el('subject').value = syllabusData.some(s => s.subject === 'Indian Society') ? 'Indian Society' : syllabusData[0].subject;
   updateSyllabusLines();
 }
 function updateSyllabusLines() {
@@ -279,17 +266,36 @@ function downloadJson() {
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escapeAttr(s) { return escapeHtml(s); }
 
-populateYears();
-populateSubjects();
-el('subject').addEventListener('change', () => syncSubject(el('subject').value));
-el('syllabusLine').addEventListener('change', updateCode);
-el('generate').addEventListener('click', generate);
-el('clear').addEventListener('click', clearForm);
-el('copy').addEventListener('click', copyJson);
-el('download').addEventListener('click', downloadJson);
-el('addRecord').addEventListener('click', addRecord);
-el('nextQuestion').addEventListener('click', nextQuestion);
-el('nextQuestionOutput').addEventListener('click', nextQuestion);
+async function init() {
+  populateYears();
+  try {
+    const response = await fetch('./syllabus.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!Array.isArray(data) || data.some(item => !item || typeof item.subject !== 'string' || !Array.isArray(item.syllabus))) {
+      throw new Error('Invalid syllabus format');
+    }
+    syllabusData = data;
+    populateSubjects();
+  } catch (error) {
+    console.error('Unable to load syllabus.json', error);
+    el('subject').innerHTML = '<option value="">Unable to load syllabus.json</option>';
+    el('syllabusLine').innerHTML = '<option value="">Unable to load syllabus.json</option>';
+    el('selectedCode').textContent = '—';
+    el('generate').disabled = true;
+    alert('Could not load syllabus.json. Please check that the file exists and contains valid JSON.');
+  }
+  el('subject').addEventListener('change', () => syncSubject(el('subject').value));
+  el('syllabusLine').addEventListener('change', updateCode);
+  el('generate').addEventListener('click', generate);
+  el('clear').addEventListener('click', clearForm);
+  el('copy').addEventListener('click', copyJson);
+  el('download').addEventListener('click', downloadJson);
+  el('addRecord').addEventListener('click', addRecord);
+  el('nextQuestion').addEventListener('click', nextQuestion);
+  el('nextQuestionOutput').addEventListener('click', nextQuestion);
+}
+init();
 </script>
 </body>
 </html>
