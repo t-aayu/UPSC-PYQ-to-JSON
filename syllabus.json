@@ -1,5 +1,17 @@
 [
   {
+    "subject": "Art & Culture",
+    "syllabus": []
+  },
+  {
+    "subject": "History",
+    "syllabus": []
+  },
+  {
+    "subject": "Geography",
+    "syllabus": []
+  },
+  {
     "subject": "Indian Society",
     "syllabus": [
       "Salient features of Indian Society, Diversity of India.",
@@ -7,5 +19,41 @@
       "Effects of globalization on Indian society.",
       "Social empowerment, communalism, regionalism & secularism."
     ]
+  },
+  {
+    "subject": "Polity",
+    "syllabus": []
+  },
+  {
+    "subject": "IR",
+    "syllabus": []
+  },
+  {
+    "subject": "Governance",
+    "syllabus": []
+  },
+  {
+    "subject": "Social Justice",
+    "syllabus": []
+  },
+  {
+    "subject": "Economy",
+    "syllabus": []
+  },
+  {
+    "subject": "Science & Technology",
+    "syllabus": []
+  },
+  {
+    "subject": "Environment & Biodiversity",
+    "syllabus": []
+  },
+  {
+    "subject": "Disaster Management",
+    "syllabus": []
+  },
+  {
+    "subject": "Internal Security",
+    "syllabus": []
   }
 ]
